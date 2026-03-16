@@ -1,0 +1,163 @@
+Gemini ha dicho
+¡Me encanta el desafío! Desarrollar un competidor para TomoTurnos es un proyecto ambicioso pero muy viable, porque aunque hay muchas soluciones de turnos, muchas se sienten "viejas" o son difíciles de configurar.
+
+Para superarlo, no solo necesitas que funcione; necesitas que sea más fluido, más inteligente y más integrado. Aquí tienes una hoja de ruta para desarrollar una versión superadora:
+
+1. ¿Cómo hacerlo "Mejor"? (El Valor Agregado)
+Para ganar mercado, no copies lo que ya existe, soluciona lo que a la gente le molesta de las plataformas actuales:
+
+IA para optimización: Un asistente que sugiera huecos en la agenda para maximizar las ganancias o que gestione cancelaciones de último momento avisando automáticamente a los que están en lista de espera.
+
+Interfaz "Mobile-First": La mayoría saca turnos desde el celular. Si tu UX es más rápida que TomoTurnos, ya ganaste.
+
+Pagos Integrados: Obligar a una seña (vía Mercado Pago o Stripe) para evitar los "no-show" (gente que reserva y no va).
+
+Recordatorios por WhatsApp (No solo mail): El mail ya nadie lo mira. Una integración directa con la API de WhatsApp es clave.
+
+Personalización por nicho: No es lo mismo un turno para un dentista (historia clínica) que para una cancha de fútbol (pago compartido).
+
+2. El Stack Tecnológico Sugerido
+Para un producto moderno, escalable y rápido, yo te sugeriría:
+
+Componente	Opción Recomendada	¿Por qué?
+Frontend	Next.js (React)	Excelente SEO y velocidad de carga.
+Backend	Node.js (TypeScript)	Ideal para manejar múltiples conexiones en tiempo real.
+Base de Datos	PostgreSQL	Estructura robusta para manejar agendas complejas.
+Infraestructura	Supabase o Firebase	Acelera el desarrollo de la base de datos y autenticación.
+Notificaciones	Twilio o Meta API	Para enviar los mensajes de WhatsApp.
+3. Funcionalidades Clave (MVP)
+No intentes hacer todo de entrada. Empieza con lo que "duele":
+
+Dashboard del Profesional: Vista de calendario (semanal/mensual) ultra clara.
+
+Link Público de Reserva: Una URL simple (tuapp.com/nombre-negocio) para que el cliente elija día y hora.
+
+Gestión de Servicios: Poder definir duración y precio por cada tipo de turno.
+
+Sincronización con Google Calendar: Para que el profesional no tenga que mirar dos agendas.
+
+4. El Modelo de Negocio
+¿Cómo vas a monetizarlo?
+
+Freemium: Hasta 50 turnos al mes gratis, luego pagas.
+
+Suscripción Mensual (SaaS): Un precio fijo por profesional o por sucursal.
+
+Comisión por reserva: Si incluyes pagos, podrías cobrar un pequeño porcentaje por el uso de la pasarela.
+Gemini ha dicho
+¡Manos a la obra! Para que este proyecto no sea un "monstruo" inmanejable, lo vamos a dividir en Sprints. Como PM, mi objetivo es que cada ticket sea una pieza del rompecabezas que encaje perfectamente.
+
+Usaremos el stack: Next.js (App Router), Supabase (Auth + DB) y Stripe/Mercado Pago.
+
+🏁 Epic 1: El Corazón (Infraestructura y Auth)
+[TT-1] Configuración del Entorno y Arquitectura Base
+Objetivo: Tener el "esqueleto" listo para recibir código.
+
+Cómo hacerlo: Inicializar proyecto Next.js 14+ con TypeScript y Tailwind CSS. Configurar Supabase CLI y vincular el proyecto.
+
+Acceptance Criteria:
+
+Repasitorio en GitHub creado.
+
+README.md con instrucciones de instalación.
+
+Despliegue inicial en Vercel funcionando (página de "Próximamente").
+
+[TT-2] Autenticación de Usuarios (Profesional vs. Cliente)
+Objetivo: Permitir el ingreso seguro.
+
+Cómo hacerlo: Usar Supabase Auth. Implementar Magic Link (sin contraseña) para mejorar la UX. Definir roles en la tabla profiles.
+
+Acceptance Criteria:
+
+Login/Registro funcional.
+
+Redirección basada en rol (el profesional va al Dashboard, el cliente a su historial).
+
+📅 Epic 2: Configuración del Negocio (El "Vendedor")
+[TT-3] Perfil de Negocio y Servicios
+Objetivo: Que el profesional defina qué vende y cuánto tarda.
+
+Cómo hacerlo: Formulario para nombre, logo, descripción y un CRUD de "Servicios" (Nombre, Duración en min, Precio, Monto de Seña).
+
+Acceptance Criteria:
+
+El usuario puede crear/editar un servicio (ej: "Corte de pelo - 45 min - $1500").
+
+Los datos se guardan en la tabla services.
+
+[TT-4] Configuración de Disponibilidad (El "Motor")
+Objetivo: Definir horarios de atención.
+
+Cómo hacerlo: UI de selector de días (Lunes a Viernes) y rangos horarios (09:00 a 18:00). Guardar en formato JSON o tabla availability.
+
+Acceptance Criteria:
+
+Poder marcar "Cerrado" ciertos días.
+
+Validar que la hora de fin sea posterior a la de inicio.
+
+🖱️ Epic 3: Experiencia del Cliente (Reserva Superior)
+[TT-5] Generación de Slots Disponibles (Lógica de Backend)
+Objetivo: Mostrar solo los huecos libres reales.
+
+Cómo hacerlo: Crear una función (Edge Function o API Route) que cruce el horario de atención con los turnos ya ocupados y devuelva los "bloques" libres según la duración del servicio.
+
+Acceptance Criteria:
+
+Si un servicio dura 60 min, no mostrar un hueco de 30 min.
+
+Excluir turnos ya reservados.
+
+[TT-6] Flujo de Reserva UI (Mobile First)
+Objetivo: Que reservar sea un placer, no un trámite.
+
+Cómo hacerlo: Interfaz de calendario simplificada -> Selección de hora -> Resumen de reserva.
+
+Acceptance Criteria:
+
+Funciona perfecto en pantallas de celular (sin scroll lateral).
+
+Barra de progreso clara.
+
+💰 Epic 4: Pagos y Notificaciones (Valor Agregado)
+[TT-7] Integración de Pagos (Seña Obligatoria)
+Objetivo: Reducir ausencias cobrando una seña.
+
+Cómo hacerlo: Integrar SDK de Mercado Pago o Stripe. Al confirmar reserva, generar un "Preference ID" y redirigir.
+
+Acceptance Criteria:
+
+El turno queda en estado "Pendiente" hasta que el webhook de pago confirme el éxito.
+
+Manejo de errores si el pago falla.
+
+[TT-8] Notificaciones vía WhatsApp (API)
+Objetivo: El recordatorio que sí se lee.
+
+Cómo hacerlo: Usar la API de WhatsApp Business (o proveedores como Twilio/Wwebjs). Gatillar mensaje al confirmar y 2 horas antes del turno.
+
+Acceptance Criteria:
+
+Envío automático de mensaje con: Día, Hora y Link de cancelación.
+
+📱 Epic 5: PWA y Pulido Final
+[TT-9] Implementación de PWA (Instalable)
+Objetivo: Que parezca una App nativa.
+
+Cómo hacerlo: Configurar next-pwa, crear manifest.json y los iconos necesarios. Configurar Service Workers para caché básico.
+
+Acceptance Criteria:
+
+Aparece el banner de "Instalar en pantalla de inicio" en iOS y Android.
+
+Funciona (pantalla de carga) sin conexión a internet.
+
+[TT-10] IA: Optimizador de Agenda
+Objetivo: La mejora "inteligente" que mencionamos.
+
+Cómo hacerlo: Un script que analice los huecos "muertos" de 15-20 min y sugiera al profesional mover un turno o enviar una oferta a clientes frecuentes.
+
+Acceptance Criteria:
+
+Sección de "Sugerencias de optimización" en el dashboard.
