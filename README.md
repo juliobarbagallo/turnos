@@ -37,6 +37,39 @@ Plataforma de turnos online con Next.js y Supabase. Inspirada en TomoTurnos, mej
 4. Nombre: "SuperTurnos"
 5. **Add** → **Issues** → vincular los issues del repo
 
+## Desarrollo local
+
+```bash
+# Instalar dependencias
+npm install
+
+# Copiar variables de entorno
+cp .env.example .env.local
+# Editar .env.local con tus credenciales de Supabase
+
+# Desarrollo
+npm run dev
+
+# Build
+npm run build
+```
+
+## Deploy en Vercel
+
+1. Conectar el repo en [vercel.com](https://vercel.com)
+2. Agregar variables de entorno: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Deploy automático en cada push a `main`
+
+## Estructura del proyecto
+
+```
+app/          # App Router (páginas y layouts)
+components/   # Componentes React
+lib/          # Utilidades, cliente Supabase
+hooks/        # Custom hooks
+services/     # Servicios y lógica de negocio
+```
+
 ## Próximos pasos
 
-Comenzar con **TT-1: Setup y Arquitectura**.
+TT-1 completado. Siguiente: **TT-2: Auth y Roles**.
