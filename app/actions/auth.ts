@@ -1,16 +1,27 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+async function getBaseUrl(formRedirectOrigin?: string | null): Promise<string> {
+  const h = await headers();
+  const forwardedHost = h.get("x-forwarded-host");
+  const forwardedProto = h.get("x-forwarded-proto");
+  if (forwardedHost && forwardedProto) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+  return (
+    formRedirectOrigin ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000"
+  );
+}
 
 export async function signInWithMagicLink(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
-  const redirectOrigin = formData.get("redirect_origin") as string | null;
-  const baseUrl =
-    redirectOrigin ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "http://localhost:3000";
+  const baseUrl = await getBaseUrl(formData.get("redirect_origin") as string | null);
 
   if (!email) {
     return { error: "Email requerido" };
@@ -57,23 +68,12 @@ export async function signInWithPassword(formData: FormData) {
 export async function resetPassword(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
-  const redirectOrigin = formData.get("redirect_origin") as string | null;
 
   if (!email) {
     return { error: "Email requerido" };
   }
 
-  // Usar el origin del request (desde donde el usuario envió el form) para que
-  // el link del email apunte a la URL correcta (prod o localhost)
-  const baseUrl =
-    redirectOrigin ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "http://localhost:3000";
-
-  // DEBUG: ver qué valores llegan (revisar logs en Vercel)
-  console.log("[resetPassword] redirectOrigin:", redirectOrigin);
-  console.log("[resetPassword] NEXT_PUBLIC_SITE_URL:", process.env.NEXT_PUBLIC_SITE_URL);
-  console.log("[resetPassword] baseUrl usado:", baseUrl);
+  const baseUrl = await getBaseUrl(formData.get("redirect_origin") as string | null);
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${baseUrl}/auth/callback?next=/recuperar-password`,
   });
@@ -100,11 +100,7 @@ export async function signUp(formData: FormData) {
     return { error: "Email y contraseña requeridos" };
   }
 
-  const redirectOrigin = formData.get("redirect_origin") as string | null;
-  const baseUrl =
-    redirectOrigin ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "http://localhost:3000";
+  const baseUrl = await getBaseUrl(formData.get("redirect_origin") as string | null);
 
   const { data, error } = await supabase.auth.signUp({
     email,
