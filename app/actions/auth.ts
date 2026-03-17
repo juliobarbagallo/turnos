@@ -54,7 +54,7 @@ export async function signUp(formData: FormData) {
     return { error: "Email y contraseña requeridos" };
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -64,13 +64,29 @@ export async function signUp(formData: FormData) {
   });
 
   if (error) {
+    if (error.message.includes("already registered") || error.message.includes("already exists")) {
+      return {
+        error: "Ese email ya está registrado. Probá iniciar sesión en su lugar.",
+      };
+    }
     return { error: error.message };
+  }
+
+  // Si el usuario fue auto-confirmado (trigger en DB), iniciar sesión de inmediato
+  if (data.user) {
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (!signInError) {
+      redirect("/dashboard");
+    }
   }
 
   return {
     success: true,
     message:
-      "Revisá tu email para confirmar la cuenta (o usá Magic Link si está habilitado)",
+      "Revisá tu email para confirmar la cuenta. Si no llega, probá iniciar sesión con tu contraseña.",
   };
 }
 
