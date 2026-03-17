@@ -14,6 +14,20 @@ export default function Home() {
           Plataforma de turnos online para estudios de Pilates y centros de
           bienestar. Next.js + Supabase.
         </p>
+        <div className="flex gap-4">
+          <a
+            href="/login"
+            className="rounded-lg bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+          >
+            Ingresar
+          </a>
+          <a
+            href="/registro"
+            className="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            Registrarse
+          </a>
+        </div>
         <SupabaseStatus />
       </main>
     </div>
