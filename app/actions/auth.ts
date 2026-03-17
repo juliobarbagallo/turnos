@@ -1,27 +1,18 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-async function getBaseUrl(formRedirectOrigin?: string | null): Promise<string> {
-  const h = await headers();
-  const forwardedHost = h.get("x-forwarded-host");
-  const forwardedProto = h.get("x-forwarded-proto");
-  if (forwardedHost && forwardedProto) {
-    return `${forwardedProto}://${forwardedHost}`;
-  }
-  return (
-    formRedirectOrigin ||
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    "http://localhost:3000"
-  );
+const PRODUCTION_URL = "https://super-turnos.vercel.app";
+
+function getBaseUrl(): string {
+  return process.env.NODE_ENV === "production" ? PRODUCTION_URL : "http://localhost:3000";
 }
 
 export async function signInWithMagicLink(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
-  const baseUrl = await getBaseUrl(formData.get("redirect_origin") as string | null);
+  const baseUrl = getBaseUrl();
 
   if (!email) {
     return { error: "Email requerido" };
@@ -73,7 +64,7 @@ export async function resetPassword(formData: FormData) {
     return { error: "Email requerido" };
   }
 
-  const baseUrl = await getBaseUrl(formData.get("redirect_origin") as string | null);
+  const baseUrl = getBaseUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${baseUrl}/auth/callback?next=/recuperar-password`,
   });
@@ -100,7 +91,7 @@ export async function signUp(formData: FormData) {
     return { error: "Email y contraseña requeridos" };
   }
 
-  const baseUrl = await getBaseUrl(formData.get("redirect_origin") as string | null);
+  const baseUrl = getBaseUrl();
 
   const { data, error } = await supabase.auth.signUp({
     email,
