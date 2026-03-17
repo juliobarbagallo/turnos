@@ -6,6 +6,11 @@ import { redirect } from "next/navigation";
 export async function signInWithMagicLink(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
+  const redirectOrigin = formData.get("redirect_origin") as string | null;
+  const baseUrl =
+    redirectOrigin ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000";
 
   if (!email) {
     return { error: "Email requerido" };
@@ -14,7 +19,7 @@ export async function signInWithMagicLink(formData: FormData) {
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback?next=/dashboard`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
     },
   });
 
@@ -52,12 +57,18 @@ export async function signInWithPassword(formData: FormData) {
 export async function resetPassword(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
+  const redirectOrigin = formData.get("redirect_origin") as string | null;
 
   if (!email) {
     return { error: "Email requerido" };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  // Usar el origin del request (desde donde el usuario envió el form) para que
+  // el link del email apunte a la URL correcta (prod o localhost)
+  const baseUrl =
+    redirectOrigin ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000";
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${baseUrl}/auth/callback?next=/recuperar-password`,
   });
@@ -84,12 +95,18 @@ export async function signUp(formData: FormData) {
     return { error: "Email y contraseña requeridos" };
   }
 
+  const redirectOrigin = formData.get("redirect_origin") as string | null;
+  const baseUrl =
+    redirectOrigin ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "http://localhost:3000";
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: fullName || email, role },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback?next=/dashboard`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
     },
   });
 

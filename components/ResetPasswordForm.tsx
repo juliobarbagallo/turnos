@@ -17,6 +17,11 @@ export function ResetPasswordForm() {
 
   return (
     <form action={handleSubmit} className="space-y-4">
+      <input
+        type="hidden"
+        name="redirect_origin"
+        value={typeof window !== "undefined" ? window.location.origin : ""}
+      />
       {error && (
         <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
           {error}
