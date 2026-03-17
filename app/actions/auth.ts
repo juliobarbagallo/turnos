@@ -69,6 +69,11 @@ export async function resetPassword(formData: FormData) {
     redirectOrigin ||
     process.env.NEXT_PUBLIC_SITE_URL ||
     "http://localhost:3000";
+
+  // DEBUG: ver qué valores llegan (revisar logs en Vercel)
+  console.log("[resetPassword] redirectOrigin:", redirectOrigin);
+  console.log("[resetPassword] NEXT_PUBLIC_SITE_URL:", process.env.NEXT_PUBLIC_SITE_URL);
+  console.log("[resetPassword] baseUrl usado:", baseUrl);
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${baseUrl}/auth/callback?next=/recuperar-password`,
   });
