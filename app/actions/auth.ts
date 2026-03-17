@@ -37,10 +37,40 @@ export async function signInWithPassword(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
+    if (error.message.includes("Invalid login credentials")) {
+      return {
+        error:
+          "Email o contraseña incorrectos. Si te registraste con Magic Link, no tenés contraseña: usá 'Recuperar contraseña' para crear una.",
+      };
+    }
     return { error: error.message };
   }
 
   redirect("/dashboard");
+}
+
+export async function resetPassword(formData: FormData) {
+  const supabase = await createClient();
+  const email = formData.get("email") as string;
+
+  if (!email) {
+    return { error: "Email requerido" };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${baseUrl}/auth/callback?next=/recuperar-password`,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return {
+    success: true,
+    message:
+      "Si ese email está registrado, te enviamos un link para crear una contraseña. Revisá tu correo (y spam).",
+  };
 }
 
 export async function signUp(formData: FormData) {
@@ -88,6 +118,23 @@ export async function signUp(formData: FormData) {
     message:
       "Revisá tu email para confirmar la cuenta. Si no llega, probá iniciar sesión con tu contraseña.",
   };
+}
+
+export async function updatePassword(formData: FormData) {
+  const supabase = await createClient();
+  const password = formData.get("password") as string;
+
+  if (!password || password.length < 6) {
+    return { error: "La contraseña debe tener al menos 6 caracteres" };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
 }
 
 export async function signOut() {

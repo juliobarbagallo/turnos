@@ -27,6 +27,15 @@ export default async function LoginPage({
         <AuthForm mode="login" initialError={params.error} />
 
         <p className="text-center text-sm text-slate-500">
+          <Link
+            href="/solicitar-recuperacion"
+            className="font-medium text-slate-900 hover:underline dark:text-slate-50"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </p>
+
+        <p className="text-center text-sm text-slate-500">
           ¿No tenés cuenta?{" "}
           <Link
             href="/registro"
