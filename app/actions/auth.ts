@@ -56,6 +56,20 @@ export async function signInWithPassword(formData: FormData) {
   redirect("/dashboard");
 }
 
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const baseUrl = getBaseUrl();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
+    },
+  });
+  if (error) return { error: error.message };
+  if (data.url) redirect(data.url);
+  return { error: "Error al iniciar sesión con Google" };
+}
+
 export async function resetPassword(formData: FormData) {
   const supabase = await createClient();
   const email = formData.get("email") as string;
