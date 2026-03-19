@@ -56,14 +56,16 @@ export async function signInWithPassword(formData: FormData) {
   redirect("/dashboard");
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(role?: "admin" | "customer") {
   const supabase = await createClient();
   const baseUrl = getBaseUrl();
+  const redirectTo =
+    role === "admin"
+      ? `${baseUrl}/auth/callback?next=/dashboard&role=admin`
+      : `${baseUrl}/auth/callback?next=/dashboard`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: {
-      redirectTo: `${baseUrl}/auth/callback?next=/dashboard`,
-    },
+    options: { redirectTo },
   });
   if (error) return { error: error.message };
   if (data.url) redirect(data.url);

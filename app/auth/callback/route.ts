@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/dashboard";
+  const roleParam = searchParams.get("role");
 
   if (code) {
     const forwardedHost = request.headers.get("x-forwarded-host");
@@ -35,7 +36,14 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error && data.user && roleParam === "admin") {
+      await supabase
+        .from("profiles")
+        .update({ role: "admin" })
+        .eq("id", data.user.id);
+    }
 
     if (!error) {
       return response;

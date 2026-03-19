@@ -22,10 +22,12 @@ export function AuthForm({
   );
   const [success, setSuccess] = useState<string | null>(null);
   const [useMagicLink, setUseMagicLink] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<"admin" | "customer">("customer");
 
   async function handleGoogleSignIn() {
     setError(null);
-    const result = await signInWithGoogle();
+    const role = mode === "register" ? selectedRole : undefined;
+    const result = await signInWithGoogle(role);
     if (result?.error) setError(result.error);
   }
 
@@ -176,7 +178,8 @@ export function AuthForm({
                   name="role"
                   type="radio"
                   value="customer"
-                  defaultChecked
+                  checked={selectedRole === "customer"}
+                  onChange={() => setSelectedRole("customer")}
                   className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-500"
                 />
                 <span className="text-sm">Cliente</span>
@@ -186,6 +189,8 @@ export function AuthForm({
                   name="role"
                   type="radio"
                   value="admin"
+                  checked={selectedRole === "admin"}
+                  onChange={() => setSelectedRole("admin")}
                   className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-500"
                 />
                 <span className="text-sm">Profesional</span>
