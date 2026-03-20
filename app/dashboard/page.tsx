@@ -35,12 +35,20 @@ export default async function DashboardPage() {
           : "Como cliente, podés ver tus reservas y hacer nuevas."}
       </p>
       {isAdmin && (
-        <Link
-          href="/dashboard/servicios"
-          className="inline-block rounded-lg bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
-        >
-          Gestionar servicios
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/dashboard/servicios"
+            className="rounded-lg bg-slate-900 px-4 py-2 font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
+          >
+            Gestionar servicios
+          </Link>
+          <Link
+            href="/dashboard/horarios"
+            className="rounded-lg border border-slate-300 px-4 py-2 font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            Horarios de atención
+          </Link>
+        </div>
       )}
     </div>
   );

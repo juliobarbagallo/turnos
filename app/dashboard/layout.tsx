@@ -36,12 +36,20 @@ export default async function DashboardLayout({
           </Link>
           <nav className="flex items-center gap-4">
             {isAdmin && (
-              <Link
-                href="/dashboard/servicios"
-                className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50"
-              >
-                Servicios
-              </Link>
+              <>
+                <Link
+                  href="/dashboard/servicios"
+                  className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50"
+                >
+                  Servicios
+                </Link>
+                <Link
+                  href="/dashboard/horarios"
+                  className="text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-50"
+                >
+                  Horarios
+                </Link>
+              </>
             )}
             <span className="text-sm text-slate-600 dark:text-slate-400">
               {profile?.full_name || user.email}
