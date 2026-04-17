@@ -40,7 +40,7 @@ export async function GET(request: Request) {
         .maybeSingle(),
       admin
         .from("services")
-        .select("id, name, duration_minutes, price")
+        .select("id, name, duration_minutes, price, deposit_amount")
         .eq("user_id", professionalId)
         .order("created_at", { ascending: false }),
     ]);

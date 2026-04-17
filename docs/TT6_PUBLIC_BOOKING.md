@@ -43,3 +43,7 @@ En **Dashboard** aparece el bloque “Link público de reservas” con abrir en 
 - Zona horaria local vs UTC en UI.
 - Datos del cliente en `appointments` (email/tel).
 - Slug legible en lugar de UUID en la URL.
+
+## TT-7 (seña Stripe)
+
+Si el servicio tiene **`deposit_amount` > 0** y está configurado Stripe, la confirmación abre Checkout; ver [TT7_STRIPE_PAYMENTS.md](./TT7_STRIPE_PAYMENTS.md).

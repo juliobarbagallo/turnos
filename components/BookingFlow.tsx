@@ -8,6 +8,7 @@ type Service = {
   name: string;
   duration_minutes: number;
   price: number;
+  deposit_amount?: number | null;
 };
 
 type Context = {
@@ -15,7 +16,7 @@ type Context = {
   services: Service[];
 };
 
-type Props = { professionalId: string };
+type Props = { professionalId: string; paymentCancelled?: boolean };
 
 function formatUtcDateLabel(isoDate: string): string {
   const [y, m, d] = isoDate.split("-").map(Number);
@@ -28,7 +29,10 @@ function formatUtcDateLabel(isoDate: string): string {
   });
 }
 
-export function BookingFlow({ professionalId }: Props) {
+export function BookingFlow({
+  professionalId,
+  paymentCancelled = false,
+}: Props) {
   const [ctx, setCtx] = useState<Context | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
@@ -116,6 +120,10 @@ export function BookingFlow({ professionalId }: Props) {
       setBookError(j.error ?? "No se pudo reservar");
       return;
     }
+    if (typeof j.checkout_url === "string" && j.checkout_url.length > 0) {
+      window.location.href = j.checkout_url;
+      return;
+    }
     setDone(true);
     setPickedSlot(null);
     fetchSlots(selectedServiceId, selectedDate);
@@ -161,8 +169,19 @@ export function BookingFlow({ professionalId }: Props) {
     );
   }
 
+  const deposit =
+    selectedService != null
+      ? Number(selectedService.deposit_amount ?? 0)
+      : 0;
+  const hasDeposit = Number.isFinite(deposit) && deposit > 0;
+
   return (
     <div className="space-y-6">
+      {paymentCancelled && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+          Pago cancelado. Elegí otro horario o intentá de nuevo.
+        </div>
+      )}
       <header className="space-y-1">
         <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-2xl">
           {title}
@@ -206,6 +225,17 @@ export function BookingFlow({ professionalId }: Props) {
                 maximumFractionDigits: 0,
               })}
             </span>
+          </p>
+        )}
+        {hasDeposit && (
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+            Seña para reservar:{" "}
+            {deposit.toLocaleString("es-AR", {
+              style: "currency",
+              currency: "ARS",
+              maximumFractionDigits: 0,
+            })}{" "}
+            (pago con Stripe antes de confirmar el turno).
           </p>
         )}
       </section>
@@ -288,7 +318,13 @@ export function BookingFlow({ professionalId }: Props) {
             onClick={confirmBooking}
             className="w-full min-h-[48px] rounded-xl bg-slate-900 py-3 text-base font-semibold text-white disabled:opacity-60 dark:bg-emerald-600 dark:hover:bg-emerald-500"
           >
-            {booking ? "Reservando…" : "Confirmar reserva"}
+            {booking
+              ? hasDeposit
+                ? "Redirigiendo al pago…"
+                : "Reservando…"
+              : hasDeposit
+                ? "Pagar seña y reservar"
+                : "Confirmar reserva"}
           </button>
         </div>
       )}

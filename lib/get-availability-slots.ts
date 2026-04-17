@@ -89,7 +89,7 @@ export async function getAvailabilitySlots(
     .from("appointments")
     .select("start_at, end_at")
     .eq("professional_id", professionalId)
-    .in("status", ["confirmed", "pending"])
+    .in("status", ["confirmed", "pending", "pending_payment"])
     .lt("start_at", new Date(dayEndMs).toISOString())
     .gt("end_at", new Date(dayStartMs).toISOString());
 

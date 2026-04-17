@@ -11,10 +11,13 @@ export const metadata = {
 
 export default async function ReservarPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ professionalId: string }>;
+  searchParams: Promise<{ cancelled?: string }>;
 }) {
   const { professionalId } = await params;
+  const { cancelled } = await searchParams;
   if (!professionalId || !UUID_RE.test(professionalId)) {
     notFound();
   }
@@ -22,7 +25,10 @@ export default async function ReservarPage({
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-6 pb-28 dark:from-slate-950 dark:to-slate-900 sm:px-6">
       <div className="mx-auto max-w-md">
-        <BookingFlow professionalId={professionalId} />
+        <BookingFlow
+          professionalId={professionalId}
+          paymentCancelled={cancelled === "1"}
+        />
       </div>
     </div>
   );
